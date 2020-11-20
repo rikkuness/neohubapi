@@ -5,6 +5,8 @@ import asyncio
 import json
 import logging
 
+from system import System
+
 class NeoHub:
     def __init__(self):
         self._logger = logging.getLogger('neohub')
@@ -45,6 +47,20 @@ class NeoHub:
         return firmware_version
 
 
+
+    async def get_system(self):
+        """
+        Get system wide variables
+
+        Returns System object
+        """
+        message = {"GET_SYSTEM": 0}
+
+        data = await self._send(message)
+        system_data = System(data)
+        return system_data
+
+
     async def reset(self):
         """
         Reboot neohub
@@ -61,12 +77,13 @@ class NeoHub:
         else:
             return False
 
-
-    async def get_system(self):
+    async def set_channel(self, channel: int):
         """
-        Get system wide variables
-        """
-        message = {"GET_SYSTEM": 0}
+        Set ZigBee channel.
 
-        data = await self._send(message)
-        return data
+        Only channels 11, 14, 15, 19, 20, 24, 25 are allowed.
+        """
+
+        message = {"SET_CHANNEL": channel}
+
+        result = await self._send(message)

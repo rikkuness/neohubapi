@@ -14,7 +14,7 @@ async def run():
     await hub.connect()
     firmware_version = await hub.firmware()
     print(firmware_version)
-    result = await hub.get_system()
+    result = await hub.set_channel(14)
     print(result)
 
 
