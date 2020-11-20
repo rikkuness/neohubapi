@@ -8,7 +8,6 @@ import logging
 class NeoHub:
     def __init__(self):
         self._logger = logging.getLogger('neohub')
-        self._firmware_version = 0
         pass
 
 
