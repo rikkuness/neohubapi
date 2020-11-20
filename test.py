@@ -12,9 +12,9 @@ import logging
 async def run():
     hub = neohub.NeoHub()
     await hub.connect()
-    firmware_version = await hub.firmware()
-    print(firmware_version)
-    result = await hub.set_temp_format("C")
+    system = await hub.get_system()
+    print(vars(system))
+    result = await hub.set_format("NONPROGRAMMABLE")
     print(result)
 
 

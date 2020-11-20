@@ -109,6 +109,7 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
+
     async def set_temp_format(self, temp_format):
         """
         Set temperature format to C or F
@@ -116,6 +117,23 @@ class NeoHub:
 
         message = {"SET_TEMP_FORMAT": temp_format}
         reply = {"result": f"Temperature format set to {temp_format}"}
+
+        result = await self._send(message, reply)
+        return result
+
+
+    async def set_format(self, format):
+        """
+        Sets timer format
+
+        "NONPROGRAMMABLE" - non programmable (time clocks cannot be non programmable)
+        "24HOURSFIXED" - same format every day of the week
+        "5DAY/2DAY" - 5 day / 2 day
+        "7DAY"      - 7 day (every day different)
+        """
+
+        message = {"SET_FORMAT": format}
+        reply = {"result": "Format was set"}
 
         result = await self._send(message, reply)
         return result
