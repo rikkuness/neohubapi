@@ -17,28 +17,46 @@ class NeoHub:
         self._firmware_version = await self._firmware()
 
 
-    async def send(self, message):
+    async def _send(self, message, expect_return = True):
         encoded_message = bytearray(json.dumps(message) + "\0\r", "utf-8")
+        self._logger.debug(f"Sending message: {encoded_message}")
         self._writer.write(encoded_message)
         await self._writer.drain()
 
-        data = await self._reader.read(4096)
-        json_string = data.decode('utf-8')
-        self._logger.debug(f"Received message: {json_string}")
-        return json.loads(json_string)
+        if expect_return:
+            data = await self._reader.read(4096)
+            json_string = data.decode('utf-8')
+            self._logger.debug(f"Received message: {json_string}")
+            return json.loads(json_string)
+
 
     def firmware(self):
         return self._firmware_version
 
+
     async def firmware(self):
         return self._firmware_version
 
+
     async def _firmware(self):
-        '''
+        """
         NeoHub firmware version
-        '''
+        """
 
         message = {"FIRMWARE": 0}
-        result = await self.send(message)
+        result = await self._send(message)
         firmware_version = int(result['firmware version'])
         return firmware_version
+
+
+    async def reset(self):
+        """
+        Reboot neohub
+        """
+        message = {"RESET": 0}
+        
+        if self._firmware_version >= 2027:
+            await self._send(message, expect_return = False)
+            return True
+        else:
+            return False
