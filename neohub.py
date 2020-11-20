@@ -98,7 +98,18 @@ class NeoHub:
         """
 
         message = {"SET_CHANNEL": channel}
-        reply = {"result":"Trying to change channel"}
+        reply = {"result": "Trying to change channel"}
+
+        result = await self._send(message, reply)
+        return result
+
+    async def set_temp_format(self, temp_format):
+        """
+        Set temperature format to C or F
+        """
+
+        message = {"SET_TEMP_FORMAT": temp_format}
+        reply = {"result": f"Temperature format set to {temp_format}"}
 
         result = await self._send(message, reply)
         return result

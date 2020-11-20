@@ -14,9 +14,9 @@ async def run():
     await hub.connect()
     firmware_version = await hub.firmware()
     print(firmware_version)
-    result = await hub.set_channel(11)
+    result = await hub.set_temp_format("C")
     print(result)
 
 
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.DEBUG)
 asyncio.run(run())
