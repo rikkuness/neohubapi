@@ -12,7 +12,8 @@ import logging
 async def run():
     hub = neohub.NeoHub()
     await hub.connect()
-    print(await hub.firmware())
+    firmware_version = await hub.firmware()
+    print(firmware_version)
     result = await hub.get_system()
     print(result)
 

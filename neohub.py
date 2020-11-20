@@ -23,12 +23,14 @@ class NeoHub:
         writer.write(encoded_message)
         await writer.drain()
 
-        data = await reader.read(4096)
+        data = await reader.readuntil(b'\0')
+        data = data.strip(b'\0')
         json_string = data.decode('utf-8')
         self._logger.debug(f"Received message: {json_string}")
+
         writer.close()
         await writer.wait_closed()
-        print(json_string)
+
         return json.loads(json_string)
 
 
