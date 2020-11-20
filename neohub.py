@@ -13,37 +13,32 @@ class NeoHub:
 
 
     async def connect(self, host='Neo-Hub', port='4242'):
-        self._reader, self._writer = await asyncio.open_connection(host, port)
-        self._firmware_version = await self._firmware()
+        self._host = host
+        self._port = port
 
 
-    async def _send(self, message, expect_return = True):
+    async def _send(self, message):
+        reader, writer = await asyncio.open_connection(self._host, self._port)
         encoded_message = bytearray(json.dumps(message) + "\0\r", "utf-8")
         self._logger.debug(f"Sending message: {encoded_message}")
-        self._writer.write(encoded_message)
-        await self._writer.drain()
+        writer.write(encoded_message)
+        await writer.drain()
 
-        if expect_return:
-            data = await self._reader.read(4096)
-            json_string = data.decode('utf-8')
-            self._logger.debug(f"Received message: {json_string}")
-            return json.loads(json_string)
-
-
-    def firmware(self):
-        return self._firmware_version
+        data = await reader.read(4096)
+        json_string = data.decode('utf-8')
+        self._logger.debug(f"Received message: {json_string}")
+        writer.close()
+        await writer.wait_closed()
+        print(json_string)
+        return json.loads(json_string)
 
 
     async def firmware(self):
-        return self._firmware_version
-
-
-    async def _firmware(self):
         """
         NeoHub firmware version
         """
-
         message = {"FIRMWARE": 0}
+
         result = await self._send(message)
         firmware_version = int(result['firmware version'])
         return firmware_version
@@ -52,11 +47,25 @@ class NeoHub:
     async def reset(self):
         """
         Reboot neohub
+
+        Returns True if Restart is initiated
         """
         message = {"RESET": 0}
-        
-        if self._firmware_version >= 2027:
-            await self._send(message, expect_return = False)
-            return True
+
+        firmware_version = await self.firmware()
+        result = ""
+        if firmware_version >= 2027:
+            result = await self._send(message)
+            return result['Restarting'] == 1
         else:
             return False
+
+
+    async def get_system(self):
+        """
+        Get system wide variables
+        """
+        message = {"GET_SYSTEM": 0}
+
+        data = await self._send(message)
+        return data

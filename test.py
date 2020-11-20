@@ -11,9 +11,10 @@ import logging
 
 async def run():
     hub = neohub.NeoHub()
-    connection = await hub.connect()
-    result = await hub.firmware()
-    print(f"Firmware: {result}")
+    await hub.connect()
+    print(await hub.firmware())
+    result = await hub.get_system()
+    print(result)
 
 
 logging.basicConfig(level=logging.DEBUG)
