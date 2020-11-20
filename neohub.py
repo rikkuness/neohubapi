@@ -18,7 +18,7 @@ class NeoHub:
         self._port = port
 
 
-    async def _send(self, message):
+    async def _send(self, message, expected_reply = None):
         reader, writer = await asyncio.open_connection(self._host, self._port)
         encoded_message = bytearray(json.dumps(message) + "\0\r", "utf-8")
         self._logger.debug(f"Sending message: {encoded_message}")
@@ -33,13 +33,23 @@ class NeoHub:
         writer.close()
         await writer.wait_closed()
 
-        return json.loads(json_string)
+        reply = json.loads(json_string)
+
+        if expected_reply is None:
+            return reply
+        else:
+            if reply == expected_reply:
+                return True
+            else:
+                self._logger.error(f"Unexpected reply: {reply}")
+                return False
 
 
     async def firmware(self):
         """
         NeoHub firmware version
         """
+
         message = {"FIRMWARE": 0}
 
         result = await self._send(message)
@@ -67,15 +77,18 @@ class NeoHub:
 
         Returns True if Restart is initiated
         """
+
         message = {"RESET": 0}
+        reply = {"Restarting": 1}
 
         firmware_version = await self.firmware()
         result = ""
         if firmware_version >= 2027:
-            result = await self._send(message)
-            return result['Restarting'] == 1
+            result = await self._send(message, reply)
+            return result
         else:
             return False
+
 
     async def set_channel(self, channel: int):
         """
@@ -85,5 +98,7 @@ class NeoHub:
         """
 
         message = {"SET_CHANNEL": channel}
+        reply = {"result":"Trying to change channel"}
 
-        result = await self._send(message)
+        result = await self._send(message, reply)
+        return result
