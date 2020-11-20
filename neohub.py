@@ -33,7 +33,13 @@ class NeoHub:
         writer.close()
         await writer.wait_closed()
 
-        reply = json.loads(json_string)
+        try:
+            reply = json.loads(json_string)
+        except json.decoder.JSONDecodeError:
+            if expected_reply is None:
+                raise(e)
+            else:
+                return False
 
         if expected_reply is None:
             return reply
