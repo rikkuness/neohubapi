@@ -190,3 +190,29 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
+
+
+    async def get_zones(self):
+        """
+        Returns list of zones and their ids
+
+        {"zone1": 1}
+        """
+
+        message = {"GET_ZONES": 0}
+
+        result = await self._send(message)
+        return result
+
+
+    async def get_devices(self):
+        """
+        Returns list of devices
+
+        {"result": ["device1"]}
+        """
+
+        message = {"GET_DEVICES": 0}
+
+        result = await self._send(message)
+        return result

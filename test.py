@@ -15,11 +15,8 @@ async def run():
     hub = neohub.NeoHub()
     await hub.connect()
     system = await hub.get_system()
-    print(vars(system))
-    result = await hub.cancel_holiday()
+    result = await hub.get_devices()
     print(result)
-    result = await hub.get_holiday()
-    print(vars(result))
 
 
 logging.basicConfig(level=logging.DEBUG)
