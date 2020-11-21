@@ -303,3 +303,34 @@ class NeoHub:
         if result:
             result = await self.set_time(date_time)
         return result
+
+
+    async def manual_dst(self, state: bool):
+        """
+        Manually enables/disables daylight saving time
+        """
+
+        message = {"MANUAL_DST": int(state)}
+        reply = {"result": "Updated time"}
+
+        result = await self._send(message, reply)
+        return result
+
+
+    async def set_dst(self, state: bool, region = None):
+        """
+        Enables/disables automatic DST handling.
+
+        By default it uses UK dates for turning DST on/off.
+        Available options for region are UK, EU, NZ.
+        """
+
+        message = {"DST_ON" if state else "DST_OFF": 0 if region is None else region}
+        reply = {"result": "dst on" if state else "dst off"}
+
+        valid_timezones = ["UK", "EU", "NZ"]
+        if region not in valid_timezones:
+            return False
+
+        result = await self._send(message, reply)
+        return result
