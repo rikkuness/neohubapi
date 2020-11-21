@@ -2,11 +2,13 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
 import asyncio
+import datetime
 import json
 import logging
 
 from enums import ScheduleFormat
 from system import System
+from holiday import Holiday
 
 
 class NeoHub:
@@ -153,11 +155,38 @@ class NeoHub:
         return result
 
 
+    async def holiday(self, start: datetime.datetime, end: datetime.datetime):
+        """
+        Sets holiday mode.
+
+        start: beginning of holiday
+        end: end of holiday
+        """
+
+        message = {"HOLIDAY": [start.strftime("%H%M%S%d%m%Y"), end.strftime("%H%M%S%d%m%Y")]}
+
+        result = await self._send(message)
+        return result
+
     async def get_holiday(self):
         """
         Get list of holidays
+
+        Returns Holiday object
         """
         message = {"GET_HOLIDAY": 0}
 
         result = await self._send(message)
+        return Holiday(result)
+
+
+    async def cancel_holiday(self):
+        """
+        Cancels holidays and returns to normal schedule
+        """
+
+        message = {"CANCEL_HOLIDAY": 0}
+        reply = {"result": "holiday cancelled"}
+
+        result = await self._send(message, reply)
         return result

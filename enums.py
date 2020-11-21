@@ -9,12 +9,11 @@ import enum
 class ScheduleFormat(str, enum.Enum):
     """
     Enum to specify Schedule Format
+
     ZERO  - non programmable (time clocks cannot be non programmable)
     ONE   - same format every day of the week
     TWO   - 5 day / 2 day
     SEVEN - 7 day (every day different)
-
-
     """
 
     ZERO = "NONPROGRAMMABLE"

@@ -5,8 +5,9 @@
 
 
 import asyncio
-import neohub
+import datetime
 import logging
+import neohub
 
 from enums import ScheduleFormat
 
@@ -15,8 +16,10 @@ async def run():
     await hub.connect()
     system = await hub.get_system()
     print(vars(system))
-    result = await hub.get_holiday()
+    result = await hub.cancel_holiday()
     print(result)
+    result = await hub.get_holiday()
+    print(vars(result))
 
 
 logging.basicConfig(level=logging.DEBUG)
