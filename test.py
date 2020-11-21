@@ -15,7 +15,7 @@ async def run():
     await hub.connect()
     system = await hub.get_system()
     print(vars(system))
-    result = await hub.set_format(ScheduleFormat.ZERO)
+    result = await hub.get_holiday()
     print(result)
 
 

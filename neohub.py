@@ -131,7 +131,7 @@ class NeoHub:
         Format is specified using ScheduleFormat enum:
         """
 
-        message = {"SET_FORMAT": format: ScheduleFormat}
+        message = {"SET_FORMAT": format}
         reply = {"result": "Format was set"}
 
         result = await self._send(message, reply)
@@ -146,8 +146,18 @@ class NeoHub:
         Instead of this function it is recommended to use frost on/off commands.
         """
 
-        message = { "AWAY_ON" if state else "AWAY_OFF": 0}
+        message = {"AWAY_ON" if state else "AWAY_OFF": 0}
         reply = {"result": "away on" if state else "away off"}
 
         result = await self._send(message, reply)
+        return result
+
+
+    async def get_holiday(self):
+        """
+        Get list of holidays
+        """
+        message = {"GET_HOLIDAY": 0}
+
+        result = await self._send(message)
         return result
