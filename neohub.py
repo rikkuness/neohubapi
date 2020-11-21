@@ -112,7 +112,7 @@ class NeoHub:
         return result
 
 
-    async def set_temp_format(self, temp_format):
+    async def set_temp_format(self, temp_format: str):
         """
         Set temperature format to C or F
         """
@@ -131,8 +131,23 @@ class NeoHub:
         Format is specified using ScheduleFormat enum:
         """
 
-        message = {"SET_FORMAT": format}
+        message = {"SET_FORMAT": format: ScheduleFormat}
         reply = {"result": "Format was set"}
+
+        result = await self._send(message, reply)
+        return result
+
+
+    async def set_away(self, state: bool):
+        """
+        Enables away mode for all devices.
+
+        Puts thermostats into frost mode and timeclocks are set to off.
+        Instead of this function it is recommended to use frost on/off commands.
+        """
+
+        message = { "AWAY_ON" if state else "AWAY_OFF": 0}
+        reply = {"result": "away on" if state else "away off"}
 
         result = await self._send(message, reply)
         return result
