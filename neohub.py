@@ -5,7 +5,9 @@ import asyncio
 import json
 import logging
 
+from enums import ScheduleFormat
 from system import System
+
 
 class NeoHub:
     def __init__(self):
@@ -122,14 +124,11 @@ class NeoHub:
         return result
 
 
-    async def set_format(self, format):
+    async def set_format(self, format: ScheduleFormat):
         """
-        Sets timer format
+        Sets schedule format
 
-        "NONPROGRAMMABLE" - non programmable (time clocks cannot be non programmable)
-        "24HOURSFIXED" - same format every day of the week
-        "5DAY/2DAY" - 5 day / 2 day
-        "7DAY"      - 7 day (every day different)
+        Format is specified using ScheduleFormat enum:
         """
 
         message = {"SET_FORMAT": format}
