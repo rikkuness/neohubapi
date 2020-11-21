@@ -258,3 +258,48 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
+
+
+    async def set_date(self, date = None):
+        """
+        Sets current date
+
+        By default, set to current date. Can be optionally passed datetime.datetime object
+        """
+
+        if date is None:
+            date = datetime.datetime.today()
+
+        message = {"SET_DATE": [date.year, date.month, date.day]}
+        reply = {"result": "Date is set"}
+
+        result = await self._send(message, reply)
+        return result
+
+
+    async def set_time(self, time = None):
+        """
+        Sets current time
+
+        By default, set to current time. Can be optionally passed datetime.datetime object
+        """
+
+        if time is None:
+            time = datetime.datetime.now()
+
+        message = {"SET_TIME": [time.hour, time.minute]}
+        reply = {"result": "time set"}
+
+        result = await self._send(message, reply)
+        return result
+
+
+    async def set_datetime(self, date_time = None):
+        """
+        Convenience method to set both date and time
+        """
+
+        result = await self.set_date(date_time)
+        if result:
+            result = await self.set_time(date_time)
+        return result
