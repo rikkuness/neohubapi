@@ -15,7 +15,7 @@ async def run():
     hub = neohub.NeoHub()
     await hub.connect()
     system = await hub.get_system()
-    result = await hub.get_devices()
+    result = await hub.devices_sn()
     print(result)
 
 

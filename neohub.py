@@ -216,3 +216,30 @@ class NeoHub:
 
         result = await self._send(message)
         return result
+
+
+    async def get_device_list(self, zone: str):
+        """
+        Returns list of devices associated with zone
+        """
+
+        message = {"GET_DEVICE_LIST": zone}
+
+        result = await self._send(message)
+        if 'error' in result:
+            return False
+        else:
+            return result[zone]
+
+
+    async def devices_sn(self):
+        """
+        Returns serial numbers of attached devices
+
+        {'name': [id, 'serial', 1], ...}
+        """
+
+        message = {"DEVICES_SN": 0}
+
+        result = await self._send(message)
+        return result
