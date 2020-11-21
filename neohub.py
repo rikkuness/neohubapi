@@ -146,6 +146,8 @@ class NeoHub:
 
         Puts thermostats into frost mode and timeclocks are set to off.
         Instead of this function it is recommended to use frost on/off commands.
+
+        List of devices affected by this can be restricted using GLOBAL_DEV_LIST command
         """
 
         message = {"AWAY_ON" if state else "AWAY_OFF": 0}
@@ -167,6 +169,7 @@ class NeoHub:
 
         result = await self._send(message)
         return result
+
 
     async def get_holiday(self):
         """
@@ -242,4 +245,16 @@ class NeoHub:
         message = {"DEVICES_SN": 0}
 
         result = await self._send(message)
+        return result
+
+
+    async def set_ntp(self, state: bool):
+        """
+        Enables NTP client on Neohub
+        """
+
+        message = {"NTP_ON" if state else "NTP_OFF": 0}
+        reply = {"result": "ntp client started" if state else "ntp client stopped"}
+
+        result = await self._send(message, reply)
         return result
