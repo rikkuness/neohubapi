@@ -71,3 +71,7 @@ class NeoStat:
     async def unlock(self):
         result = await self._hub.unlock([self])
         return result
+
+    async def frost(self, state: bool):
+        result = await self._hub.frost(state, [self])
+        return result

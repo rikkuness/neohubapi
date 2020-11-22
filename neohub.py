@@ -379,3 +379,15 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
+
+    async def frost(self, state: bool, devices: [NeoStat]):
+        """
+        Enables or disables Frost mode
+        """
+
+        names = [x.name for x in devices]
+        message = {"FROST_ON" if state else "FROST_OFF": names}
+        reply = {"result": "frost on" if state else "frost off"}
+
+        result = await self._send(message, reply)
+        return result
