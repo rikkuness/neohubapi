@@ -34,3 +34,16 @@ class NeoStat:
 
         result = await self._hub._send(message, reply)
         return result
+
+    async def rename(self, new_name):
+        """
+        Renames this zone
+        """
+
+        message = {"ZONE_TITLE": [self.name, new_name]}
+        reply = {"result": "flashing led"}
+
+        result = await self._hub._send(message, reply)
+        if result:
+            self.name = new_name
+        return result
