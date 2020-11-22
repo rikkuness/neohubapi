@@ -9,6 +9,7 @@ import logging
 from enums import ScheduleFormat
 from system import System
 from holiday import Holiday
+from neostat import NeoStat
 
 
 class NeoHub:
@@ -197,14 +198,18 @@ class NeoHub:
 
     async def get_zones(self):
         """
-        Returns list of zones and their ids
+        Get list of all thermostats
 
-        {"zone1": 1}
+        Returns a list of NeoStat objects
         """
 
         message = {"GET_ZONES": 0}
 
-        result = await self._send(message)
+        zones = await self._send(message)
+        result = []
+        for name,zone_id in zones.items():
+            result.append(NeoStat(name, zone_id))
+
         return result
 
 
