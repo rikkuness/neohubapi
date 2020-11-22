@@ -328,6 +328,16 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
+    async def get_live_data(self):
+        """
+        Returns unstructured live data from all devices
+        """
+
+        message = {"GET_LIVE_DATA": 0}
+
+        result = await self._send(message)
+        return result
+
     async def permit_join(self, name, timeout_s=120):
         """
         Permit new thermostat to join network
