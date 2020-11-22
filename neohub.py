@@ -17,13 +17,11 @@ class NeoHub:
         self._logger = logging.getLogger('neohub')
         pass
 
-
     async def connect(self, host='Neo-Hub', port='4242'):
         self._host = host
         self._port = port
 
-
-    async def _send(self, message, expected_reply = None):
+    async def _send(self, message, expected_reply=None):
         reader, writer = await asyncio.open_connection(self._host, self._port)
         encoded_message = bytearray(json.dumps(message) + "\0\r", "utf-8")
         self._logger.debug(f"Sending message: {encoded_message}")
@@ -40,7 +38,7 @@ class NeoHub:
 
         try:
             reply = json.loads(json_string)
-        except json.decoder.JSONDecodeError:
+        except json.decoder.JSONDecodeError as e:
             if expected_reply is None:
                 raise(e)
             else:
@@ -55,7 +53,6 @@ class NeoHub:
                 self._logger.error(f"Unexpected reply: {reply}")
                 return False
 
-
     async def firmware(self):
         """
         NeoHub firmware version
@@ -66,8 +63,6 @@ class NeoHub:
         result = await self._send(message)
         firmware_version = int(result['firmware version'])
         return firmware_version
-
-
 
     async def get_system(self):
         """
@@ -80,7 +75,6 @@ class NeoHub:
         data = await self._send(message)
         system_data = System(data)
         return system_data
-
 
     async def reset(self):
         """
@@ -100,7 +94,6 @@ class NeoHub:
         else:
             return False
 
-
     async def set_channel(self, channel: int):
         """
         Set ZigBee channel.
@@ -114,7 +107,6 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-
     async def set_temp_format(self, temp_format: str):
         """
         Set temperature format to C or F
@@ -125,7 +117,6 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
-
 
     async def set_format(self, format: ScheduleFormat):
         """
@@ -140,15 +131,14 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-
     async def set_away(self, state: bool):
         """
         Enables away mode for all devices.
 
         Puts thermostats into frost mode and timeclocks are set to off.
-        Instead of this function it is recommended to use frost on/off commands.
+        Instead of this function it is recommended to use frost on/off commands
 
-        List of devices affected by this can be restricted using GLOBAL_DEV_LIST command
+        List of affected devices can be restricted using GLOBAL_DEV_LIST command
         """
 
         message = {"AWAY_ON" if state else "AWAY_OFF": 0}
@@ -156,7 +146,6 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
-
 
     async def holiday(self, start: datetime.datetime, end: datetime.datetime):
         """
@@ -171,7 +160,6 @@ class NeoHub:
         result = await self._send(message)
         return result
 
-
     async def get_holiday(self):
         """
         Get list of holidays
@@ -182,7 +170,6 @@ class NeoHub:
 
         result = await self._send(message)
         return Holiday(result)
-
 
     async def cancel_holiday(self):
         """
@@ -195,7 +182,6 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-
     async def get_zones(self):
         """
         Get list of all thermostats
@@ -207,11 +193,10 @@ class NeoHub:
 
         zones = await self._send(message)
         result = []
-        for name,zone_id in zones.items():
-            result.append(NeoStat(name, zone_id))
+        for name, zone_id in zones.items():
+            result.append(NeoStat(self, name, zone_id))
 
         return result
-
 
     async def get_devices(self):
         """
@@ -224,7 +209,6 @@ class NeoHub:
 
         result = await self._send(message)
         return result
-
 
     async def get_device_list(self, zone: str):
         """
@@ -239,7 +223,6 @@ class NeoHub:
         else:
             return result[zone]
 
-
     async def devices_sn(self):
         """
         Returns serial numbers of attached devices
@@ -252,7 +235,6 @@ class NeoHub:
         result = await self._send(message)
         return result
 
-
     async def set_ntp(self, state: bool):
         """
         Enables NTP client on Neohub
@@ -264,8 +246,7 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-
-    async def set_date(self, date = None):
+    async def set_date(self, date=None):
         """
         Sets current date
 
@@ -281,8 +262,7 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-
-    async def set_time(self, time = None):
+    async def set_time(self, time=None):
         """
         Sets current time
 
@@ -298,8 +278,7 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-
-    async def set_datetime(self, date_time = None):
+    async def set_datetime(self, date_time=None):
         """
         Convenience method to set both date and time
         """
@@ -308,7 +287,6 @@ class NeoHub:
         if result:
             result = await self.set_time(date_time)
         return result
-
 
     async def manual_dst(self, state: bool):
         """
@@ -321,8 +299,7 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-
-    async def set_dst(self, state: bool, region = None):
+    async def set_dst(self, state: bool, region=None):
         """
         Enables/disables automatic DST handling.
 
@@ -339,7 +316,6 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
-
 
     async def identify(self):
         """

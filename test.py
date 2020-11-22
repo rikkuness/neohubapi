@@ -11,6 +11,7 @@ import neohub
 
 from enums import ScheduleFormat
 
+
 async def run():
     hub = neohub.NeoHub()
     await hub.connect()

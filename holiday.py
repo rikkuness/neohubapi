@@ -6,6 +6,7 @@
 import datetime
 import enum
 
+
 class Holiday:
     """
     Class representing Holidays
@@ -29,18 +30,15 @@ class Holiday:
 
         self._ids = reply["ids"]
 
-
     @property
     def start(self):
         """ Beginning of holiday. """
         return self._start
 
-
     @property
     def end(self):
         """ End of holiday. """
         return self._end
-
 
     @property
     def ids(self):
