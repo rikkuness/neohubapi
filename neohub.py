@@ -391,3 +391,17 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
+
+    async def set_temp(self, temperature: int, devices: [NeoStat]):
+        """
+        Sets the thermostat's temperature
+
+        The temperature will be reset once next comfort level is reached
+        """
+
+        names = [x.name for x in devices]
+        message = {"SET_TEMP": [temperature, names]}
+        reply = {"result": "temperature was set"}
+
+        result = await self._send(message, reply)
+        return result

@@ -75,3 +75,7 @@ class NeoStat:
     async def frost(self, state: bool):
         result = await self._hub.frost(state, [self])
         return result
+
+    async def set_temp(self, temperature: int):
+        result = await self._hub.set_temp(temperature, [self])
+        return result
