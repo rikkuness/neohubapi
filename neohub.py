@@ -334,3 +334,15 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
+
+
+    async def identify(self):
+        """
+        Flashes red LED light
+        """
+
+        message = {"IDENTIFY": 0}
+        reply = {"result": "flashing led"}
+
+        result = await self._send(message, reply)
+        return result

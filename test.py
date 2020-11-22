@@ -15,7 +15,7 @@ async def run():
     hub = neohub.NeoHub()
     await hub.connect()
     system = await hub.get_system()
-    result = await hub.set_ntp(True)
+    result = await hub.identify()
     print(result)
 
 
