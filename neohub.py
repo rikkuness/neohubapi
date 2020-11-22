@@ -344,3 +344,38 @@ class NeoHub:
 
         result = await self._send(message)
         return result
+
+    async def lock(self, pin: int, devices: [NeoStat]):
+        """
+        PIN locks thermostats
+
+        PIN is a four digit number
+        """
+
+        if pin < 0 or pin > 9999:
+            return False
+
+        pins = []
+        for x in range(4):
+            pins.append(pin % 10)
+            pin = pin // 10
+        pins.reverse()
+
+        names = [x.name for x in devices]
+        message = {"LOCK": [pins, names]}
+        reply = {"result": "locked"}
+
+        result = await self._send(message, reply)
+        return result
+
+    async def unlock(self, devices: [NeoStat]):
+        """
+        Unlocks PIN locked thermostats
+        """
+
+        names = [x.name for x in devices]
+        message = {"UNLOCK": names}
+        reply = {"result": "unlocked"}
+
+        result = await self._send(message, reply)
+        return result

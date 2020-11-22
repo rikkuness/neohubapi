@@ -63,3 +63,11 @@ class NeoStat:
 
         result = await self._hub._send(message, reply)
         return result
+
+    async def lock(self, pin: int):
+        result = await self._hub.lock(pin, [self])
+        return result
+
+    async def unlock(self):
+        result = await self._hub.unlock([self])
+        return result
