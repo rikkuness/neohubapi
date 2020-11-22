@@ -327,3 +327,20 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
+
+    async def permit_join(self, name, timeout_s=120):
+        """
+        Permit new thermostat to join network
+
+        name: new zone will be added with this name
+        timeout: duration of discovery mode in seconds
+
+        To actually join network you need to select 01
+        from the thermostat's setup menu.
+        """
+
+        message = {"PERMIT_JOIN": [timeout_s, name]}
+        reply = {"result": "network allows joining"}
+
+        result = await self._send(message)
+        return result

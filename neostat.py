@@ -47,3 +47,19 @@ class NeoStat:
         if result:
             self.name = new_name
         return result
+
+    async def remove(self):
+        """
+        Removes this zone
+
+        If successful, thermostat will be disconnected from the hub
+        Note that it takes a few seconds to remove thermostat
+        New get_zones call will still return the original list
+        during that period.
+        """
+
+        message = {"REMOVE_ZONE": self.name}
+        reply = {"result": "zone removed"}
+
+        result = await self._hub._send(message, reply)
+        return result
