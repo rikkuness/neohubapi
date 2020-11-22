@@ -79,3 +79,7 @@ class NeoStat:
     async def set_temp(self, temperature: int):
         result = await self._hub.set_temp(temperature, [self])
         return result
+
+    async def set_diff(self, switching_differential: int):
+        result = await self._hub.set_diff(switching_differential, [self])
+        return result

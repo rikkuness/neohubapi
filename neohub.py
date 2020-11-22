@@ -415,3 +415,21 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
+
+    async def set_diff(self, switching_differential: int, devices: [NeoStat]):
+        """
+        Sets the thermostat's switching differential
+
+       -1: Undocumented option. Seems to set differential to 204.
+        0: 0.5 degrees
+        1: 1 degree
+        2: 2 degrees
+        3: 3 degrees
+        """
+
+        names = [x.name for x in devices]
+        message = {"SET_DIFF": [switching_differential, names]}
+        reply = {"result": "switching differential was set"}
+
+        result = await self._send(message, reply)
+        return result
