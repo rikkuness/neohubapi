@@ -5,9 +5,10 @@ import asyncio
 import datetime
 import json
 import logging
+from types import SimpleNamespace
 
 from enums import ScheduleFormat
-from system import System
+from enums import schedule_format_int_to_enum
 from holiday import Holiday
 from neostat import NeoStat
 
@@ -37,7 +38,7 @@ class NeoHub:
         await writer.wait_closed()
 
         try:
-            reply = json.loads(json_string)
+            reply = json.loads(json_string, object_hook=lambda d: SimpleNamespace(**d))
         except json.decoder.JSONDecodeError as e:
             if expected_reply is None:
                 raise(e)
@@ -67,14 +68,13 @@ class NeoHub:
     async def get_system(self):
         """
         Get system wide variables
-
-        Returns System object
         """
         message = {"GET_SYSTEM": 0}
 
         data = await self._send(message)
-        system_data = System(data)
-        return system_data
+        data.FORMAT = schedule_format_int_to_enum(data.FORMAT)
+        data.ALT_TIMER_FORMAT = schedule_format_int_to_enum(data.ALT_TIMER_FORMAT)
+        return data
 
     async def reset(self):
         """
@@ -164,12 +164,14 @@ class NeoHub:
         """
         Get list of holidays
 
-        Returns Holiday object
+        start end end times are converted to datetimes
         """
         message = {"GET_HOLIDAY": 0}
 
         result = await self._send(message)
-        return Holiday(result)
+        result.start = datetime.datetime.strptime(result.start.strip(), "%a %b %d %H:%M:%S %Y") if result.start else None
+        result.end = datetime.datetime.strptime(result.end.strip(), "%a %b %d %H:%M:%S %Y")  if result.end else None
+        return result
 
     async def cancel_holiday(self):
         """
@@ -193,7 +195,7 @@ class NeoHub:
 
         zones = await self._send(message)
         result = []
-        for name, zone_id in zones.items():
+        for name, zone_id in zones.__dict__.items():
             result.append(NeoStat(self, name, zone_id))
 
         return result

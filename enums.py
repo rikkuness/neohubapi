@@ -20,3 +20,15 @@ class ScheduleFormat(str, enum.Enum):
     ONE = "24HOURSFIXED"
     TWO = "5DAY/2DAY"
     SEVEN = "7DAY"
+
+def schedule_format_int_to_enum(int_format):
+    if int_format == 0:
+        return ScheduleFormat.ZERO
+    elif int_format == 1:
+        return ScheduleFormat.ONE
+    elif int_format == 2:
+        return ScheduleFormat.TWO
+    elif int_format == 4:
+        return ScheduleFormat.SEVEN
+    else:
+        raise ValueError('Unrecognized ScheduleFormat')
