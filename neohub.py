@@ -9,7 +9,6 @@ from types import SimpleNamespace
 
 from enums import ScheduleFormat
 from enums import schedule_format_int_to_enum
-from holiday import Holiday
 from neostat import NeoStat
 
 
@@ -332,7 +331,7 @@ class NeoHub:
 
     async def get_live_data(self):
         """
-        Returns unstructured live data from all devices
+        Returns live data from all devices
         """
 
         message = {"GET_LIVE_DATA": 0}

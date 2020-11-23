@@ -16,8 +16,10 @@ async def run():
     hub = neohub.NeoHub()
     await hub.connect()
     system = await hub.get_system()
-    result = await hub.get_zones()
-    print(result)
+    result = await hub.get_live_data()
+    devices = result.devices
+    for device in devices:
+        print(f"Temperature in zone {device.ZONE_NAME}: {device.ACTUAL_TEMP}")
 
 
 logging.basicConfig(level=logging.DEBUG)
