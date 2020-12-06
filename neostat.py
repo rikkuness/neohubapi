@@ -3,33 +3,36 @@
 # SPDX-FileCopyrightText: 2020 Andrius Štikonas <andrius@stikonas.eu>
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
+from types import SimpleNamespace
 
-class NeoStat:
+
+class NeoStat(SimpleNamespace):
     """
     Class representing NeoStat theormostat
     """
 
-    def __init__(self, hub, name: str, zone_id: int):
+    def __init__(self, hub, thermostat):
+        self._data_ = thermostat
         self._hub = hub
-        self._name = name
-        self._zone_id = zone_id
 
     @property
     def name(self):
         """ Zone name. """
-        return self._name
+
+        return self._data_.ZONE_NAME
 
     @property
-    def zone_id(self):
-        """ End of holiday. """
-        return self._zone_id
+    def temperature(self):
+        """ Actual zone temperature. """
+
+        return self._data_.ACTUAL_TEMP
 
     async def identify(self):
         """
         Flashes red LED light
         """
 
-        message = {"IDENTIFY_DEV": self.zone_id}
+        message = {"IDENTIFY_DEV": self.name}
         reply = {"result": "Device identifying"}
 
         result = await self._hub._send(message, reply)

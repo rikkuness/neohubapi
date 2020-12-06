@@ -183,19 +183,19 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-    async def get_zones(self):
-        """
-        Get list of all thermostats
+    #async def get_zones(self):
+        #"""
+        #Get list of all thermostats
 
-        Returns a list of NeoStat objects
-        """
+        #Returns a list of NeoStat objects
+        #"""
 
-        message = {"GET_ZONES": 0}
+        #message = {"GET_ZONES": 0}
 
-        zones = await self._send(message)
-        result = []
-        for name, zone_id in zones.__dict__.items():
-            result.append(NeoStat(self, name, zone_id))
+        #zones = await self._send(message)
+        #result = []
+        #for name, zone_id in zones.__dict__.items():
+            #result.append(NeoStat(self, name, zone_id))
 
         return result
 
@@ -331,13 +331,21 @@ class NeoHub:
 
     async def get_live_data(self):
         """
-        Returns live data from all devices
+        Returns live data from hub and all devices
         """
 
         message = {"GET_LIVE_DATA": 0}
 
-        result = await self._send(message)
-        return result
+        hub_data = await self._send(message)
+        devices = hub_data.devices
+        delattr(hub_data, "devices")
+
+        thermostat_list = list(filter(lambda device: device.THERMOSTAT, devices))
+        thermostats = []
+        for thermostat in thermostat_list:
+            thermostats.append(NeoStat(self, thermostat))
+
+        return hub_data, thermostats
 
     async def permit_join(self, name, timeout_s=120):
         """
