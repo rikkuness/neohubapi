@@ -83,3 +83,7 @@ class NeoStat:
     async def set_diff(self, switching_differential: int):
         result = await self._hub.set_diff(switching_differential, [self])
         return result
+
+    async def rate_of_change(self):
+        result = await self._hub.rate_of_change([self])
+        return result

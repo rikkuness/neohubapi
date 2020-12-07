@@ -434,3 +434,14 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
+
+    async def rate_of_change(self, devices: [NeoStat]):
+        """
+        Returns time in minutes required to change temperature by 1 degree
+        """
+
+        names = [x.name for x in devices]
+        message = {"VIEW_ROC": names}
+
+        result = await self._send(message)
+        return result
