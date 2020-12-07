@@ -41,11 +41,9 @@ class NeoStat:
         """
 
         message = {"ZONE_TITLE": [self.name, new_name]}
-        reply = {"result": "flashing led"}
+        reply = {"result": "zone renamed"}
 
         result = await self._hub._send(message, reply)
-        if result:
-            self.name = new_name
         return result
 
     async def remove(self):

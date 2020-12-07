@@ -47,7 +47,7 @@ class NeoHub:
         if expected_reply is None:
             return reply
         else:
-            if reply == expected_reply:
+            if reply.__dict__ == expected_reply:
                 return True
             else:
                 self._logger.error(f"Unexpected reply: {reply}")
