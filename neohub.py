@@ -364,7 +364,7 @@ class NeoHub:
         result = await self._send(message)
         return result
 
-    async def lock(self, pin: int, devices: [NeoStat]):
+    async def set_lock(self, pin: int, devices: [NeoStat]):
         """
         PIN locks thermostats
 
@@ -399,7 +399,7 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-    async def frost(self, state: bool, devices: [NeoStat]):
+    async def set_frost(self, state: bool, devices: [NeoStat]):
         """
         Enables or disables Frost mode
         """

@@ -6,7 +6,7 @@
 import enum
 
 
-class ScheduleFormat(str, enum.Enum):
+class ScheduleFormat(enum.Enum):
     """
     Enum to specify Schedule Format
 
@@ -21,6 +21,7 @@ class ScheduleFormat(str, enum.Enum):
     TWO = "5DAY/2DAY"
     SEVEN = "7DAY"
 
+
 def schedule_format_int_to_enum(int_format):
     if int_format == 0:
         return ScheduleFormat.ZERO
@@ -32,3 +33,13 @@ def schedule_format_int_to_enum(int_format):
         return ScheduleFormat.SEVEN
     else:
         raise ValueError('Unrecognized ScheduleFormat')
+
+
+class Weekday(enum.Enum):
+    MONDAY = "monday"
+    TUESDAY = "tuesday"
+    WEDNESDAY = "wednesday"
+    THURSDAY = "thursday"
+    FRIDAY = "friday"
+    SATURDAY = "saturday"
+    SUNDAY = "sunday"

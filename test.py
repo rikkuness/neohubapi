@@ -19,7 +19,7 @@ async def run():
     hub_data, thermostats = await hub.get_live_data()
     for device in thermostats:
         print(f"Temperature in zone {device.name}: {device.temperature}")
-        #await device.identify()
+        await device.identify()
 
 
 logging.basicConfig(level=logging.DEBUG)
