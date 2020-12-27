@@ -20,4 +20,5 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires = ['neohubapi'],
     keywords = ['neohub', 'heatmiser'],
+    zip_safe = True,
 )
