@@ -3,9 +3,9 @@
 # SPDX-FileCopyrightText: 2020 Andrius Štikonas <andrius@stikonas.eu>
 # SPDX-License-Identifier: MIT
 
-from setuptools import setup
+import setuptools
 
-setup(
+setuptools.setup(
     name = "neohubapi",
     version = "0.1",
     description = "Async library to communicate with Heatmiser NeoHub 2 API.",

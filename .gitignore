@@ -5,3 +5,6 @@ __pycache__
 *~
 .kdev4
 *.kdev4
+build/
+dist/
+neohubapi.egg-info/
