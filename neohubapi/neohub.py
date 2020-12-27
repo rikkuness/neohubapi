@@ -449,4 +449,4 @@ class NeoHub:
         message = {"VIEW_ROC": names}
 
         result = await self._send(message)
-        return result
+        return result.__dict__

@@ -4,8 +4,9 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
 from datetime import datetime, timedelta
-
 from types import SimpleNamespace
+
+from async_property import async_property
 
 from neohubapi.enums import Weekday
 
@@ -122,6 +123,8 @@ class NeoStat(SimpleNamespace):
         result = await self._hub.set_diff(switching_differential, [self])
         return result
 
+    @async_property
     async def rate_of_change(self):
         result = await self._hub.rate_of_change([self])
-        return result
+        roc = result[self.name]
+        return roc
