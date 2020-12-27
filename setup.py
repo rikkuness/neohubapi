@@ -17,7 +17,7 @@ setup(
         "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
         "Operating System :: OS Independent",
     ],
-    packages = ['neohubapi'],
+    packages=setuptools.find_packages(),
     install_requires = ['neohubapi'],
     keywords = ['neohub', 'heatmiser'],
 )
