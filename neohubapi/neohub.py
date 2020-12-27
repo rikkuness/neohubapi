@@ -7,9 +7,9 @@ import json
 import logging
 from types import SimpleNamespace
 
-from enums import ScheduleFormat
-from enums import schedule_format_int_to_enum
-from neostat import NeoStat
+from neohubapi.enums import ScheduleFormat
+from neohubapi.enums import schedule_format_int_to_enum
+from neohubapi.neostat import NeoStat
 
 
 class NeoHub:

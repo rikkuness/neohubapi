@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from types import SimpleNamespace
 
-from enums import Weekday
+from neohubapi.enums import Weekday
 
 
 class NeoStat(SimpleNamespace):

@@ -7,9 +7,9 @@
 import asyncio
 import datetime
 import logging
-import neohub
+import neohubapi.neohub as neohub
 
-from enums import ScheduleFormat
+from neohubapi.enums import ScheduleFormat
 
 
 async def run():
