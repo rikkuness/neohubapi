@@ -61,7 +61,7 @@ class NeoHub:
         message = {"FIRMWARE": 0}
 
         result = await self._send(message)
-        firmware_version = int(result['firmware version'])
+        firmware_version = int(getattr(result, 'firmware version'))
         return firmware_version
 
     async def get_system(self):
@@ -74,6 +74,17 @@ class NeoHub:
         data.FORMAT = schedule_format_int_to_enum(data.FORMAT)
         data.ALT_TIMER_FORMAT = schedule_format_int_to_enum(data.ALT_TIMER_FORMAT)
         return data
+
+    async def target_temperature_step(self):
+        """
+        Returns Neohub's target temperature step
+        """
+
+        firmware_version = await self.firmware()
+        if firmware_version >= 2135:
+            return 0.5
+        else:
+            return 1
 
     async def reset(self):
         """
