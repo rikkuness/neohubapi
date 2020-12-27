@@ -5,6 +5,7 @@ import asyncio
 import datetime
 import json
 import logging
+from async_property import async_property, async_cached_property
 from types import SimpleNamespace
 
 from neohubapi.enums import ScheduleFormat
@@ -75,6 +76,7 @@ class NeoHub:
         data.ALT_TIMER_FORMAT = schedule_format_int_to_enum(data.ALT_TIMER_FORMAT)
         return data
 
+    @async_cached_property
     async def target_temperature_step(self):
         """
         Returns Neohub's target temperature step
