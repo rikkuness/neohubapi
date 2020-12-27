@@ -159,7 +159,7 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-    async def holiday(self, start: datetime.datetime, end: datetime.datetime):
+    async def set_holiday(self, start: datetime.datetime, end: datetime.datetime):
         """
         Sets holiday mode.
 
