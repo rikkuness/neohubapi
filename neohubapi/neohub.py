@@ -196,22 +196,6 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-    #async def get_zones(self):
-        #"""
-        #Get list of all thermostats
-
-        #Returns a list of NeoStat objects
-        #"""
-
-        #message = {"GET_ZONES": 0}
-
-        #zones = await self._send(message)
-        #result = []
-        #for name, zone_id in zones.__dict__.items():
-            #result.append(NeoStat(self, name, zone_id))
-
-        return result
-
     async def get_devices(self):
         """
         Returns list of devices
