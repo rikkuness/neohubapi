@@ -53,7 +53,7 @@ class NeoStat(SimpleNamespace):
         self.preheat_active = int(self._data_.PREHEAT_ACTIVE)
         self.prg_temp = self._data_.PRG_TEMP
         self.prg_timer = self._data_.PRG_TIMER
-        self.set_temp = self._data_.SET_TEMP  # target temperature
+        self.target_temperature = self._data_.SET_TEMP  # target temperature
         self.standby = self._data_.STANDBY
         _switch_delay_left = datetime.strptime(self._data_.SWITCH_DELAY_LEFT, "%H:%M")
         self.switch_delay_left = timedelta(hours=_switch_delay_left.hour, minutes=_switch_delay_left.minute)
@@ -115,7 +115,7 @@ class NeoStat(SimpleNamespace):
         result = await self._hub.frost(state, [self])
         return result
 
-    async def set_temp(self, temperature: int):
+    async def set_target_temperature(self, temperature: int):
         result = await self._hub.set_temp(temperature, [self])
         return result
 
