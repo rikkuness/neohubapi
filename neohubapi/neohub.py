@@ -14,11 +14,8 @@ from neohubapi.neostat import NeoStat
 
 
 class NeoHub:
-    def __init__(self):
+    def __init__(self, host='Neo-Hub', port=4242):
         self._logger = logging.getLogger('neohub')
-        pass
-
-    async def connect(self, host='Neo-Hub', port='4242'):
         self._host = host
         self._port = port
 

@@ -14,13 +14,14 @@ from neohubapi.enums import ScheduleFormat
 
 async def run():
     hub = neohub.NeoHub()
-    await hub.connect()
     system = await hub.get_system()
     hub_data, thermostats = await hub.get_live_data()
     for device in thermostats:
-        print(f"Temperature in zone {device.name}: {device.temperature}")
+        print(f"Target temperature of {device.name}: {device.target_temperature}")
         await device.identify()
 
+    print(await hub.target_temperature_step)
 
-logging.basicConfig(level=logging.DEBUG)
+
+#logging.basicConfig(level=logging.DEBUG)
 asyncio.run(run())
