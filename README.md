@@ -20,7 +20,6 @@ from neohubapi.enums import ScheduleFormat
 
 async def run():
     hub = neohub.NeoHub()
-    await hub.connect()
     system = await hub.get_system()
     hub_data, thermostats = await hub.get_live_data()
     for device in thermostats:
