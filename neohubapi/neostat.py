@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # SPDX-FileCopyrightText: 2020 Andrius Štikonas <andrius@stikonas.eu>
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
@@ -39,8 +37,9 @@ class NeoStat(SimpleNamespace):
         self.hold_off = self._data_.HOLD_OFF
         self.hold_on = self._data_.HOLD_ON
         self.hold_temp = self._data_.HOLD_TEMP
-        _hold_time = datetime.strptime(self._data_.HOLD_TIME, "%H:%M")
-        self.hold_time = timedelta(hours=_hold_time.hour, minutes=_hold_time.minute)
+        _hold_time = list(map(int, self._data_.HOLD_TIME.split(':'))) # HOLD_TIME can be up to 99:99
+        _hold_time_minutes = _hold_time[0] * 60 + _hold_time[1]
+        self.hold_time = timedelta(minutes=_hold_time_minutes)
         self.holiday = self._data_.HOLIDAY
         self.lock = self._data_.LOCK
         self.low_battery = self._data_.LOW_BATTERY
