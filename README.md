@@ -3,26 +3,25 @@
     SPDX-License-Identifier: CC-BY-4.0
 -->
 
-# Neohubapi
+# NeoHubAPI
 
 This is a simple python wrapper around Heatmiser's Neohub API.
+
+It's primary purpose is to be used via Home Assistant integration but
+it can also be used as a standalone library.
 
 ## Usage example
 
 ```python
 import asyncio
-import datetime
-import logging
 import neohubapi.neohub as neohub
-
-from neohubapi.enums import ScheduleFormat
 
 
 async def run():
     hub = neohub.NeoHub()
     system = await hub.get_system()
-    hub_data, thermostats = await hub.get_live_data()
-    for device in thermostats:
+    hub_data, devices = await hub.get_live_data()
+    for device in devices['thermostats']:
         print(f"Temperature in zone {device.name}: {device.temperature}")
         await device.identify()
 
