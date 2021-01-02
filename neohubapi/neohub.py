@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2020 Andrius Štikonas <andrius@stikonas.eu>
+# SPDX-FileCopyrightText: 2020-2021 Andrius Štikonas <andrius@stikonas.eu>
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
 import asyncio
@@ -334,12 +334,22 @@ class NeoHub:
         devices = hub_data.devices
         delattr(hub_data, "devices")
 
-        thermostat_list = list(filter(lambda device: device.THERMOSTAT, devices))
+        thermostat_list = list(filter(lambda device: hasattr(device, 'THERMOSTAT'), devices))
+        timeclock_list = list(filter(lambda device: hasattr(device, 'TIMECLOCK'), devices))
+
         thermostats = []
+        timeclocks = []
         for thermostat in thermostat_list:
             thermostats.append(NeoStat(self, thermostat))
 
-        return hub_data, thermostats
+        for timeclock in timeclock_list:
+            timeclocks.append(NeoStat(self, timeclock))
+
+        devices = {}
+        devices['thermostats'] = thermostats
+        devices['timeclocks'] = timeclocks
+
+        return hub_data, devices
 
     async def permit_join(self, name, timeout_s=120):
         """
@@ -447,3 +457,32 @@ class NeoHub:
 
         result = await self._send(message)
         return result.__dict__
+
+    async def set_timer(self, state: bool, devices: [NeoStat]):
+        """
+        Turns the output of timeclock on or off
+
+        This function works only with NeoPlugs and does not work on
+        NeoStats that are in timeclock mode.
+        """
+
+        names = [x.name for x in devices]
+
+        message = {"TIMER_ON" if state else "TIMER_OFF": names}
+        reply = {"result": "timers on" if state else "timers off"}
+
+        result = await self._send(message, reply)
+        return result
+
+    async def set_timer_hold(self, state: bool, minutes: int, devices: [NeoStat]):
+        """
+        Turns the output of timeclock on or off
+        """
+
+        names = [x.name for x in devices]
+
+        message = {"TIMER_HOLD_ON" if state else "TIMER_HOLD_OFF": [minutes, names]}
+        reply = {"result": "timer hold on" if state else "timer hold off"}
+
+        result = await self._send(message, reply)
+        return result

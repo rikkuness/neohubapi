@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2020 Andrius Štikonas <andrius@stikonas.eu>
+# SPDX-FileCopyrightText: 2020-2021 Andrius Štikonas <andrius@stikonas.eu>
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
 from datetime import datetime, timedelta
