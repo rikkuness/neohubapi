@@ -476,7 +476,9 @@ class NeoHub:
 
     async def set_timer_hold(self, state: bool, minutes: int, devices: [NeoStat]):
         """
-        Turns the output of timeclock on or off
+        Turns the output of timeclock on or off for certain duration
+
+        This function works with NeoStats in timeclock mode
         """
 
         names = [x.name for x in devices]

@@ -127,3 +127,12 @@ class NeoStat(SimpleNamespace):
         result = await self._hub.rate_of_change([self])
         roc = result[self.name]
         return roc
+
+    async def set_timer_hold(self, state: bool, minutes: int):
+        """
+        Turns the output of timeclock on or off for certain duration
+
+        Works only with NeoStats in timeclock mode
+        """
+        result = await self._hub.set_timer_hold(state, minutes, [self])
+        return result
