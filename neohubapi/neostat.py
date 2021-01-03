@@ -111,7 +111,7 @@ class NeoStat(SimpleNamespace):
         return result
 
     async def set_frost(self, state: bool):
-        result = await self._hub.frost(state, [self])
+        result = await self._hub.set_frost(state, [self])
         return result
 
     async def set_target_temperature(self, temperature: int):
