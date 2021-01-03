@@ -11,7 +11,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="neohubapi",
-    version="0.2",
+    version="0.3",
     description="Async library to communicate with Heatmiser NeoHub 2 API.",
     url="https://gitlab.com/neohubapi/neohubapi/",
     author="Andrius Štikonas",
