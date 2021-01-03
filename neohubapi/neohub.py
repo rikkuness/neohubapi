@@ -334,8 +334,8 @@ class NeoHub:
         devices = hub_data.devices
         delattr(hub_data, "devices")
 
-        thermostat_list = list(filter(lambda device: hasattr(device, 'THERMOSTAT'), devices))
-        timeclock_list = list(filter(lambda device: hasattr(device, 'TIMECLOCK'), devices))
+        thermostat_list = list(filter(lambda device: hasattr(device, 'THERMOSTAT') and device.THERMOSTAT, devices))
+        timeclock_list = list(filter(lambda device: hasattr(device, 'TIMECLOCK') and device.TIMECLOCK, devices))
 
         thermostats = []
         timeclocks = []
