@@ -23,6 +23,8 @@ class ScheduleFormat(enum.Enum):
 
 
 def schedule_format_int_to_enum(int_format):
+    if int_format is None:
+        return None
     if int_format == 0:
         return ScheduleFormat.ZERO
     elif int_format == 1:
