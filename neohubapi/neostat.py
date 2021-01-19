@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2020-2021 Andrius Štikonas <andrius@stikonas.eu>
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
+import logging
 from datetime import datetime, timedelta
 from types import SimpleNamespace
 
@@ -15,54 +16,86 @@ class NeoStat(SimpleNamespace):
     """
 
     def __init__(self, hub, thermostat):
+        self._logger = logging.getLogger('neohub')
         self._data_ = thermostat
         self._hub = hub
 
-        self.active_level = self._data_.ACTIVE_LEVEL
-        self.active_profile = self._data_.ACTIVE_PROFILE
-        self.available_modes = self._data_.AVAILABLE_MODES
-        self.away = self._data_.AWAY
-        self.cool_on = self._data_.COOL_ON
-        self.cool_temp = self._data_.COOL_TEMP
-        self.current_floor_temperature = self._data_.CURRENT_FLOOR_TEMPERATURE
-        self.weekday = Weekday(self._data_.DATE)
-        self.device_id = self._data_.DEVICE_ID
-        self.fan_control = self._data_.FAN_CONTROL
-        self.fan_speed = self._data_.FAN_SPEED
-        self.floor_limit = self._data_.ZONE_NAME
-        self.hc_mode = self._data_.HC_MODE
-        self.heat_mode = self._data_.HEAT_MODE
-        self.heat_on = self._data_.HEAT_ON
-        self.hold_cool = self._data_.HOLD_COOL
-        self.hold_off = self._data_.HOLD_OFF
-        self.hold_on = self._data_.HOLD_ON
-        self.hold_temp = self._data_.HOLD_TEMP
-        _hold_time = list(map(int, self._data_.HOLD_TIME.split(':'))) # HOLD_TIME can be up to 99:99
+        self._simple_attrs = (
+                'active_level',
+                'active_profile',
+                'available_modes',
+                'away',
+                'cool_on',
+                'cool_temp',
+                'current_floor_temperature',
+                'date',
+                'device_id',
+                'fan_control',
+                'fan_speed',
+                'floor_limit',
+                'hc_mode',
+                'heat_mode',
+                'heat_on',
+                'hold_cool',
+                'fan_control',
+                'fan_speed',
+                'hc_mode',
+                'heat_mode',
+                'heat_on',
+                'hold_cool',
+                'hold_off',
+                'hold_on',
+                'hold_temp',
+                'hold_time',  # This is updated below.
+                'holiday',
+                'lock',
+                'low_battery',
+                'manual_off',
+                'modelock',
+                'modulation_level',
+                'offline',
+                'pin_number',
+                'preheat_active',
+                'prg_temp',
+                'prg_timer',
+                'standby',
+                'switch_delay_left',  # This is updated below.
+                'temporary_set_flag',
+                'time',  # This is updated below.
+                'timer_on',
+                'window_open',
+                'write_count'
+                )
+
+        for a in self._simple_attrs:
+            data_attr = a.upper()
+            if not hasattr(self._data_, data_attr):
+              self._logger.debug(f"Thermostat object has no attribute {data_attr}")
+            self.__dict__[a] = getattr(self._data_, data_attr, None)
+
+        # Renamed attrs
+        self.name = getattr(self._data_, 'ZONE_NAME', None)
+        self.floor_limit = getattr(self._data_, 'ZONE_NAME', None)
+        self.target_temperature = getattr(self._data_, 'SET_TEMP', None)
+        self.temperature = getattr(self._data_, 'ACTUAL_TEMP', None)
+
+        # must be ints
+        self.pin_number = int(self.pin_number)
+        self.preheat_active = int(self.preheat_active)
+
+        # HOLD_TIME can be up to 99:99
+        _hold_time = list(map(int, self.hold_time.split(':')))
         _hold_time_minutes = _hold_time[0] * 60 + _hold_time[1]
         self.hold_time = timedelta(minutes=_hold_time_minutes)
-        self.holiday = self._data_.HOLIDAY
-        self.lock = self._data_.LOCK
-        self.low_battery = self._data_.LOW_BATTERY
-        self.manual_off = self._data_.MANUAL_OFF
-        self.modelock = self._data_.MODELOCK
-        self.modulation_level = self._data_.MODULATION_LEVEL
-        self.name = self._data_.ZONE_NAME
-        self.offline = self._data_.OFFLINE
-        self.pin_number = int(self._data_.PIN_NUMBER)
-        self.preheat_active = int(self._data_.PREHEAT_ACTIVE)
-        self.prg_temp = self._data_.PRG_TEMP
-        self.prg_timer = self._data_.PRG_TIMER
-        self.target_temperature = self._data_.SET_TEMP  # target temperature
-        self.standby = self._data_.STANDBY
-        _switch_delay_left = datetime.strptime(self._data_.SWITCH_DELAY_LEFT, "%H:%M")
-        self.switch_delay_left = timedelta(hours=_switch_delay_left.hour, minutes=_switch_delay_left.minute)
-        self.temporary_set_flag = self._data_.TEMPORARY_SET_FLAG
-        self.temperature = self._data_.ACTUAL_TEMP
-        _time = datetime.strptime(self._data_.TIME, "%H:%M")
+
+        self.weekday = Weekday(self.date)
+
+        _switch_delay_left = datetime.strptime(self.switch_delay_left, "%H:%M")
+        self.switch_delay_left = timedelta(
+                hours=_switch_delay_left.hour,
+                minutes=_switch_delay_left.minute)
+        _time = datetime.strptime(self.time, "%H:%M")
         self.time = timedelta(hours=_time.hour, minutes=_time.minute)
-        self.timer_on = self._data_.TIMER_ON
-        self.window_open = self._data_.WINDOW_OPEN
-        self.write_count = self._data_.WRITE_COUNT
 
     async def identify(self):
         """
