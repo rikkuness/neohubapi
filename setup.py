@@ -27,6 +27,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=setuptools.find_packages(),
+    scripts=['scripts/neohub_cli.py'],
     keywords=['neohub', 'heatmiser'],
     zip_safe=True,
 )
