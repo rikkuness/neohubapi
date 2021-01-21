@@ -98,6 +98,19 @@ class NeoStat(SimpleNamespace):
         _time = datetime.strptime(self.time, "%H:%M")
         self.time = timedelta(hours=_time.hour, minutes=_time.minute)
 
+    def __str__(self):
+        """
+        String representation.
+        """
+        data_elem = []
+        for elem in dir(self):
+            if not callable(getattr(self, elem)) and not elem.startswith('_'):
+                data_elem.append(elem)
+        out = 'HeatMiser NeoStat (%s):\n' % (self.name)
+        for elem in data_elem:
+            out += ' - %s: %s\n' % (elem, getattr(self, elem))
+        return out
+
     async def identify(self):
         """
         Flashes red LED light

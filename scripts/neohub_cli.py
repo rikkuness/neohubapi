@@ -4,6 +4,7 @@
 # SPDX-FileCopyrightText: 2021 Dave O'Connor <daveoc@google.com>
 # SPDX-License-Identifier: MIT
 
+import types
 import asyncio
 import argparse
 from inspect import ismethod, signature
@@ -15,6 +16,10 @@ class Error(Exception):
 
 
 class NeohubCLIUsageError(Error):
+    pass
+
+
+class NeohubCLIInternalError(Error):
     pass
 
 
@@ -60,6 +65,47 @@ class NeohubCLI(object):
         print(f'Cannot do {self._command} yet')
         return None
 
+    def output(self, raw_result, output_format='json'):
+        """Produce output in a desired format."""
+        if output_format == 'raw':
+            return raw_result
+
+        # Right now, everything just returns hub data or a single outcome
+        # except get_live_data. Handle special cases.
+        special_case = getattr(self, f'_output_{self._command}', None)
+        if special_case:
+            return special_case(raw_result, output_format)
+
+        if type(raw_result) in (int, str):
+            return f'{raw_result}'
+
+        if type(raw_result) != types.SimpleNamespace:
+            raise NeohubCLIInternalError(
+                    'Unexpected type {type(raw_result)} in output()')
+
+        return self._output_simplenamespace(raw_result, output_format)
+
+    def _output_simplenamespace(self, obj, output_format):
+        """Output a types.Simplenamespace object."""
+        if output_format == 'list':
+            attrs = dict(
+                [(a, getattr(obj, a)) for a in dir(obj)
+                    if not a.startswith('_')])
+            return '\n'.join([f'{a}: {attrs[a]}' for a in attrs])
+        else:
+            raise NeohubCLIUsageError(f'Unknown output format {output_format}')
+
+    def _output_get_live_data(self, raw_result, output_format):
+        """Return special case output for get_live_data."""
+        out = self._output_simplenamespace(raw_result[0], output_format)
+        out += '\n\n'
+        for device_type in raw_result[1]:
+            out += f'{device_type}:\n'
+            devices = raw_result[1][device_type]
+            for d in devices:
+                out += str(d) + '\n'
+        return out
+
     def get_help(self, args):
         """Print help on what commands do"""
         if len(args) == 0:
@@ -91,6 +137,7 @@ async def main():
     argp.add_argument('--hub_ip', help='IP address of Neohub', default=None)
     argp.add_argument(
         '--hub_port', help='Port number of Neohub to talk to', default=4242)
+    argp.add_argument('--format', help='Output format', default='list')
     argp.add_argument('command', help='Command to issue')
     argp.add_argument('arg', help='Arguments to command', nargs='*')
     args = argp.parse_args()
@@ -104,8 +151,7 @@ async def main():
         m = nhc.callable()
         if m:
             result = await m()
-            # TODO(daveoc): Make delightful.
-            print(result)
+            print(nhc.output(result, output_format=args.format))
     except Error as e:
         print(e)
         argp.print_help()
