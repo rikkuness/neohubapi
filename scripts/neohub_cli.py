@@ -40,7 +40,7 @@ class NeohubCLI(object):
     def _hub_command_methods(self):
         """Return a list of NeoHub functions.
 
-            Right now this is just all callables not starting with _
+            Right now this is just all methods not starting with _
 
         """
         all_methods = [
