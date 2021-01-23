@@ -35,12 +35,12 @@ class NeohubCLI(object):
             return
 
         if command not in self._hub_command_methods():
-            raise NeohubCLIUsageError(f'Uknown command {command}')
+            raise NeohubCLIUsageError(f'Unknown command {command}')
 
     def _hub_command_methods(self):
         """Return a list of NeoHub functions.
 
-            Right now this is just all methods not starting with _
+           Right now this is just all methods not starting with _
 
         """
         all_methods = [
