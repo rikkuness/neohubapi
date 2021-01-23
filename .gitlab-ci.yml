@@ -1,0 +1,14 @@
+image: "python:3.8"
+
+before_script:
+  - python --version
+  - pip3 install flake8
+
+stages:
+  - Static Analysis
+
+flake8:
+  stage: Static Analysis
+  script:
+  - flake8 --max-line-length=120 neohubapi/*.py
+  - flake8 --max-line-length=120 scripts/*.py

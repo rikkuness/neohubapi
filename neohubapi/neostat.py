@@ -71,7 +71,7 @@ class NeoStat(SimpleNamespace):
         for a in self._simple_attrs:
             data_attr = a.upper()
             if not hasattr(self._data_, data_attr):
-              self._logger.debug(f"Thermostat object has no attribute {data_attr}")
+                self._logger.debug(f"Thermostat object has no attribute {data_attr}")
             self.__dict__[a] = getattr(self._data_, data_attr, None)
 
         # Renamed attrs

@@ -6,7 +6,7 @@ import asyncio
 import datetime
 import json
 import logging
-from async_property import async_property, async_cached_property
+from async_property import async_cached_property
 from types import SimpleNamespace
 
 from neohubapi.enums import ScheduleFormat
@@ -196,8 +196,10 @@ class NeoHub:
         message = {"GET_HOLIDAY": 0}
 
         result = await self._send(message)
-        result.start = datetime.datetime.strptime(result.start.strip(), "%a %b %d %H:%M:%S %Y") if result.start else None
-        result.end = datetime.datetime.strptime(result.end.strip(), "%a %b %d %H:%M:%S %Y")  if result.end else None
+        result.start = datetime.datetime.strptime(
+                result.start.strip(), "%a %b %d %H:%M:%S %Y") if result.start else None
+        result.end = datetime.datetime.strptime(
+                result.end.strip(), "%a %b %d %H:%M:%S %Y") if result.end else None
         return result
 
     async def cancel_holiday(self):
@@ -388,7 +390,7 @@ class NeoHub:
         message = {"PERMIT_JOIN": [timeout_s, name]}
         reply = {"result": "network allows joining"}
 
-        result = await self._send(message)
+        result = await self._send(message, reply)
         return result
 
     async def set_lock(self, pin: int, devices: [NeoStat]):
