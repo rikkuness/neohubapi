@@ -14,6 +14,14 @@ from neohubapi.enums import schedule_format_int_to_enum
 from neohubapi.neostat import NeoStat
 
 
+class Error(Exception):
+    pass
+
+
+class NeoHubUsageError(Error):
+    pass
+
+
 class NeoHub:
     def __init__(self, host='Neo-Hub', port=4242):
         self._logger = logging.getLogger('neohub')
@@ -111,7 +119,11 @@ class NeoHub:
         Only channels 11, 14, 15, 19, 20, 24, 25 are allowed.
         """
 
-        message = {"SET_CHANNEL": channel}
+        try:
+            message = {"SET_CHANNEL": int(channel)}
+        except ValueError:
+            raise NeoHubUsageError('channel must be a number')
+
         reply = {"result": "Trying to change channel"}
 
         result = await self._send(message, reply)
@@ -128,14 +140,16 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-    async def set_format(self, format: ScheduleFormat):
+    async def set_format(self, sched_format: ScheduleFormat):
         """
         Sets schedule format
 
         Format is specified using ScheduleFormat enum:
         """
+        if not isinstance(sched_format, ScheduleFormat):
+            raise NeoHubUsageError('sched_format must be a ScheduleFormat')
 
-        message = {"SET_FORMAT": format}
+        message = {"SET_FORMAT": sched_format}
         reply = {"result": "Format was set"}
 
         result = await self._send(message, reply)
@@ -164,6 +178,9 @@ class NeoHub:
         start: beginning of holiday
         end: end of holiday
         """
+        for datetime_arg in (start, end):
+            if not isinstance(datetime_arg, datetime.datetime):
+                raise NeoHubUsageError('start and end must be datetime.datetime objects')
 
         message = {"HOLIDAY": [start.strftime("%H%M%S%d%m%Y"), end.strftime("%H%M%S%d%m%Y")]}
 
@@ -251,6 +268,9 @@ class NeoHub:
 
         if date is None:
             date = datetime.datetime.today()
+        else:
+            if not isinstance(date, datetime.datetime):
+                raise NeoHubUsageError('date must be datetime.datetime object')
 
         message = {"SET_DATE": [date.year, date.month, date.day]}
         reply = {"result": "Date is set"}
@@ -267,6 +287,8 @@ class NeoHub:
 
         if time is None:
             time = datetime.datetime.now()
+        else:
+            raise NeoHubUsageError('time must be datetime.datetime object')
 
         message = {"SET_TIME": [time.hour, time.minute]}
         reply = {"result": "time set"}
@@ -376,8 +398,11 @@ class NeoHub:
         PIN is a four digit number
         """
 
-        if pin < 0 or pin > 9999:
-            return False
+        try:
+            if pin < 0 or pin > 9999:
+                return False
+        except TypeError:
+            raise NeoHubUsageError('pin must be a number')
 
         pins = []
         for x in range(4):
@@ -385,7 +410,11 @@ class NeoHub:
             pin = pin // 10
         pins.reverse()
 
-        names = [x.name for x in devices]
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
+
         message = {"LOCK": [pins, names]}
         reply = {"result": "locked"}
 
@@ -397,7 +426,11 @@ class NeoHub:
         Unlocks PIN locked thermostats
         """
 
-        names = [x.name for x in devices]
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
+
         message = {"UNLOCK": names}
         reply = {"result": "unlocked"}
 
@@ -409,7 +442,11 @@ class NeoHub:
         Enables or disables Frost mode
         """
 
-        names = [x.name for x in devices]
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
+
         message = {"FROST_ON" if state else "FROST_OFF": names}
         reply = {"result": "frost on" if state else "frost off"}
 
@@ -423,7 +460,11 @@ class NeoHub:
         The temperature will be reset once next comfort level is reached
         """
 
-        names = [x.name for x in devices]
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
+
         message = {"SET_TEMP": [temperature, names]}
         reply = {"result": "temperature was set"}
 
@@ -441,7 +482,11 @@ class NeoHub:
         3: 3 degrees
         """
 
-        names = [x.name for x in devices]
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
+
         message = {"SET_DIFF": [switching_differential, names]}
         reply = {"result": "switching differential was set"}
 
@@ -453,7 +498,11 @@ class NeoHub:
         Returns time in minutes required to change temperature by 1 degree
         """
 
-        names = [x.name for x in devices]
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
+
         message = {"VIEW_ROC": names}
 
         result = await self._send(message)
@@ -467,7 +516,10 @@ class NeoHub:
         NeoStats that are in timeclock mode.
         """
 
-        names = [x.name for x in devices]
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
 
         message = {"TIMER_ON" if state else "TIMER_OFF": names}
         reply = {"result": "timers on" if state else "timers off"}
@@ -482,7 +534,10 @@ class NeoHub:
         This function works with NeoStats in timeclock mode
         """
 
-        names = [x.name for x in devices]
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
 
         message = {"TIMER_HOLD_ON" if state else "TIMER_HOLD_OFF": [minutes, names]}
         reply = {"result": "timer hold on" if state else "timer hold off"}
