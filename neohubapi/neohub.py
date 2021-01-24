@@ -149,7 +149,7 @@ class NeoHub:
         if not isinstance(sched_format, ScheduleFormat):
             raise NeoHubUsageError('sched_format must be a ScheduleFormat')
 
-        message = {"SET_FORMAT": sched_format}
+        message = {"SET_FORMAT": sched_format.value}
         reply = {"result": "Format was set"}
 
         result = await self._send(message, reply)
