@@ -261,18 +261,12 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-    async def set_date(self, date=None):
+    async def set_date(self, date: datetime.datetime = datetime.datetime.today()):
         """
         Sets current date
 
         By default, set to current date. Can be optionally passed datetime.datetime object
         """
-
-        if date is None:
-            date = datetime.datetime.today()
-        else:
-            if not isinstance(date, datetime.datetime):
-                raise NeoHubUsageError('date must be datetime.datetime object')
 
         message = {"SET_DATE": [date.year, date.month, date.day]}
         reply = {"result": "Date is set"}
@@ -280,25 +274,19 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-    async def set_time(self, time=None):
+    async def set_time(self, time: datetime.datetime = datetime.datetime.now()):
         """
         Sets current time
 
         By default, set to current time. Can be optionally passed datetime.datetime object
         """
-
-        if time is None:
-            time = datetime.datetime.now()
-        else:
-            raise NeoHubUsageError('time must be datetime.datetime object')
-
         message = {"SET_TIME": [time.hour, time.minute]}
         reply = {"result": "time set"}
 
         result = await self._send(message, reply)
         return result
 
-    async def set_datetime(self, date_time=None):
+    async def set_datetime(self, date_time: datetime.datetime = datetime.datetime.now()):
         """
         Convenience method to set both date and time
         """
@@ -319,7 +307,7 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-    async def set_dst(self, state: bool, region=None):
+    async def set_dst(self, state: bool, region: str = None):
         """
         Enables/disables automatic DST handling.
 
@@ -332,7 +320,7 @@ class NeoHub:
 
         valid_timezones = ["UK", "EU", "NZ"]
         if region not in valid_timezones:
-            return False
+            raise NeoHubUsageError(f'region must be in {valid_timezones}')
 
         result = await self._send(message, reply)
         return result
@@ -376,7 +364,7 @@ class NeoHub:
 
         return hub_data, devices
 
-    async def permit_join(self, name, timeout_s=120):
+    async def permit_join(self, name, timeout_s: int = 120):
         """
         Permit new thermostat to join network
 

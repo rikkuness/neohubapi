@@ -11,6 +11,7 @@ import argparse
 import datetime
 from functools import partial
 from neohubapi.neohub import NeoHub
+from neohubapi.neohub import NeoHubUsageError
 from neohubapi.neostat import NeoStat
 from neohubapi.enums import ScheduleFormat
 
@@ -68,7 +69,7 @@ class NeoHubCLI(object):
         # Firstly, see if we have a separately-implemented exception below.
         special_method = getattr(self, f'_callable_{self._command}', None)
         if special_method:
-            return special_method()
+            return await special_method()
 
         hubmethod = getattr(self._hub, self._command)
         sig = inspect.signature(hubmethod)
@@ -161,17 +162,35 @@ class NeoHubCLI(object):
         else:
             raise NeoHubCLIInternalError(f'Unknown type {type(argtype)} {argtype} for {self._command}')
 
-    def _callable_set_date(self):
-        """Build a callable for set_date."""
+    async def _optional_datetime(self):
         # If we got an arg, assume it's a date, otherwise use today.
         if len(self._args) > 1:
-            print('set_date takes zero or one argument')
+            print(f'{self._command} takes zero or one argument')
             return None
         elif len(self._args) == 1:
-            real_arg = self._parse_arg(self._args[0], datetime.datetime)
-            return partial(getattr(self._hub, 'set_date'), *[real_arg])
+            real_arg = await self._parse_arg(self._args[0], datetime.datetime)
+            return partial(getattr(self._hub, self._command), *[real_arg])
         else:
-            return partial(getattr(self._hub, 'set_date'), *[datetime.datetime.today()])
+            return getattr(self._hub, self._command)
+
+    # These take a single datetime (optional) argument.
+    _callable_set_date = _optional_datetime
+    _callable_set_time = _optional_datetime
+    _callable_set_datetime = _optional_datetime
+
+    async def _callable_permit_join(self):
+        if len(self._args) > 2 or len(self._args) == 0:
+            print(f'{self._command} takes either 1 or 2 arguments')
+            return None
+
+        real_name = self._args[0]
+        args = [real_name]
+
+        if len(self._args) == 2:
+            timeout_s = await self._parse_arg(self._args[1], int)
+            args.append(timeout_s)
+
+        return partial(getattr(self._hub, 'permit_join'), *args)
 
     def output(self, raw_result, output_format='json'):
         """Produce output in a desired format."""
@@ -263,6 +282,8 @@ async def main():
         if m:
             result = await m()
             print(nhc.output(result, output_format=args.format))
+    except NeoHubUsageError as e:
+        print(f'Invalid API usage: {e}')
     except Error as e:
         print(e)
 
