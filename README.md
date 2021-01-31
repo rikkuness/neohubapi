@@ -33,3 +33,15 @@ asyncio.run(run())
 
 API documentation can be found from various places online or
 you can request the latest version from support@heatmiser.com
+
+## neohub_cli.py
+
+This package includes a CLI for performing common tasks.
+
+```
+$ neohub_cli.py help  # Shows all commands
+$ neohub_cli.py help set_time  # Displays help for the set_time function
+$ neohub_cli.py --hub_ip=myneohub set_time "2021-01-31 15:43:00"  # Specify times like this
+$ neohub_cli.py --hub_ip=myneohub set_lock 1234 "Living Room"  # Name NeoStats like this.
+```
+
