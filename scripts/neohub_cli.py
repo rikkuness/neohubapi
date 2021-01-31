@@ -13,7 +13,7 @@ from functools import partial
 from neohubapi.neohub import NeoHub
 from neohubapi.neohub import NeoHubUsageError
 from neohubapi.neostat import NeoStat
-from neohubapi.enums import ScheduleFormat
+from neohubapi.enums import ScheduleFormat, Weekday
 
 
 class Error(Exception):
@@ -210,10 +210,24 @@ class NeoHubCLI(object):
             return f'{raw_result}'
 
         if type(raw_result) != types.SimpleNamespace:
-            raise NeoHubCLIInternalError(
-                    f'Unexpected type {type(raw_result)} in output()')
+            if type(raw_result) == dict:
+                raw_result = types.SimpleNamespace(**raw_result)
+            else:
+                raise NeoHubCLIInternalError(
+                        f'Unexpected type {type(raw_result)} in output()')
 
         return self._output_simplenamespace(raw_result, output_format)
+
+    def _resolve_output_val(self, val):
+        """Return a readable str version of a value.
+           This is mainly so our own enums and objects look readable.
+        """
+        if type(val) in (ScheduleFormat, Weekday):
+            return val.value
+        elif type(val) == NeoStat:
+            return f'[NeoStat: {val.name}]'
+        else:
+            return val
 
     def _output_simplenamespace(self, obj, output_format):
         """Output a types.Simplenamespace object."""
@@ -221,7 +235,7 @@ class NeoHubCLI(object):
             attrs = dict(
                 [(a, getattr(obj, a)) for a in dir(obj)
                     if not a.startswith('_')])
-            return '\n'.join([f'{a}: {attrs[a]}' for a in attrs])
+            return '\n'.join([f'{a}: {self._resolve_output_val(attrs[a])}' for a in attrs])
         else:
             raise NeoHubCLIUsageError(f'Unknown output format {output_format}')
 
