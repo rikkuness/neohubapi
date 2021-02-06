@@ -28,11 +28,12 @@ class NeoHubConnectionError(Error):
 
 
 class NeoHub:
-    def __init__(self, host='Neo-Hub', port=4242, request_timeout=5):
+    def __init__(self, host='Neo-Hub', port=4242, request_timeout=5, request_attempts=1):
         self._logger = logging.getLogger('neohub')
         self._host = host
         self._port = port
         self._request_timeout = request_timeout
+        self._request_attempts = request_attempts
 
     async def _send_message(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, message: str):
         encoded_message = bytearray(json.dumps(message) + "\0\r", "utf-8")
@@ -49,39 +50,39 @@ class NeoHub:
         return data
 
     async def _send(self, message, expected_reply=None):
-        try:
-            reader, writer = await asyncio.open_connection(self._host, self._port)
-        except (socket.gaierror, ConnectionRefusedError) as e:
-            err = f'Could not connect to NeoHub at {self._host}: {e}'
-            self._logger.error(err)
-            raise NeoHubConnectionError from e
+        last_exception = None
+        for attempt in range(1, self._request_attempts+1):
+            try:
+                reader, writer = await asyncio.open_connection(self._host, self._port)
+                data = await asyncio.wait_for(
+                        self._send_message(reader, writer, message), timeout=self._request_timeout)
+                json_string = data.decode('utf-8')
+                self._logger.debug(f"Received message: {json_string}")
+                reply = json.loads(json_string, object_hook=lambda d: SimpleNamespace(**d))
 
-        try:
-            data = await asyncio.wait_for(
-                    self._send_message(reader, writer, message), timeout=self._request_timeout)
-        except asyncio.TimeoutError as e:
-            self._logger.error(f'Timeout talking to NeoHub: {e}')
-            return False
+                if expected_reply is None:
+                    return reply
+                if reply.__dict__ == expected_reply:
+                    return True
+                self._logger.error(f"[{attempt}] Unexpected reply: {reply}")
+            except (socket.gaierror, ConnectionRefusedError) as e:
+                last_exception = NeoHubConnectionError(e)
+                self._logger.error(f"[{attempt}] Could not connect to NeoHub at {self._host}: {e}")
+            except asyncio.TimeoutError as e:
+                last_exception = e
+                self._logger.error(f"[{attempt}] Timed out while sending a message to {self._host}")
+                if writer is not None:
+                    writer.close()
+            except json.decoder.JSONDecodeError as e:
+                last_exception = e
+                self._logger.error(f"[{attempt}] Could not decode JSON: {e}")
+            # Wait for 1/2 of the timeout value before retrying.
+            if self._request_attempts > 1 and attempt < self._request_attempts:
+                await asyncio.sleep(self._request_timeout / 2)
 
-        json_string = data.decode('utf-8')
-        self._logger.debug(f"Received message: {json_string}")
-
-        try:
-            reply = json.loads(json_string, object_hook=lambda d: SimpleNamespace(**d))
-        except json.decoder.JSONDecodeError as e:
-            if expected_reply is None:
-                raise(e)
-            else:
-                return False
-
-        if expected_reply is None:
-            return reply
-        else:
-            if reply.__dict__ == expected_reply:
-                return True
-            else:
-                self._logger.error(f"Unexpected reply: {reply}")
-                return False
+        if expected_reply is None and last_exception is not None:
+            raise(last_exception)
+        return False
 
     async def firmware(self):
         """
