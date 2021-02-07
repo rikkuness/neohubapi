@@ -6,6 +6,7 @@ import asyncio
 import datetime
 import json
 import logging
+import socket
 from async_property import async_cached_property
 from types import SimpleNamespace
 
@@ -22,26 +23,48 @@ class NeoHubUsageError(Error):
     pass
 
 
+class NeoHubConnectionError(Error):
+    pass
+
+
 class NeoHub:
-    def __init__(self, host='Neo-Hub', port=4242):
+    def __init__(self, host='Neo-Hub', port=4242, request_timeout=5):
         self._logger = logging.getLogger('neohub')
         self._host = host
         self._port = port
+        self._request_timeout = request_timeout
 
-    async def _send(self, message, expected_reply=None):
-        reader, writer = await asyncio.open_connection(self._host, self._port)
+    async def _send_message(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, message: str):
         encoded_message = bytearray(json.dumps(message) + "\0\r", "utf-8")
         self._logger.debug(f"Sending message: {encoded_message}")
         writer.write(encoded_message)
         await writer.drain()
 
         data = await reader.readuntil(b'\0')
-        data = data.strip(b'\0')
-        json_string = data.decode('utf-8')
-        self._logger.debug(f"Received message: {json_string}")
 
         writer.close()
         await writer.wait_closed()
+
+        data = data.strip(b'\0')
+        return data
+
+    async def _send(self, message, expected_reply=None):
+        try:
+            reader, writer = await asyncio.open_connection(self._host, self._port)
+        except (socket.gaierror, ConnectionRefusedError) as e:
+            err = f'Could not connect to NeoHub at {self._host}: {e}'
+            self._logger.error(err)
+            raise NeoHubConnectionError from e
+
+        try:
+            data = await asyncio.wait_for(
+                    self._send_message(reader, writer, message), timeout=self._request_timeout)
+        except asyncio.TimeoutError as e:
+            self._logger.error(f'Timeout talking to NeoHub: {e}')
+            return False
+
+        json_string = data.decode('utf-8')
+        self._logger.debug(f"Received message: {json_string}")
 
         try:
             reply = json.loads(json_string, object_hook=lambda d: SimpleNamespace(**d))
