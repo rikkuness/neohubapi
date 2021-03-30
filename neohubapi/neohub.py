@@ -28,7 +28,7 @@ class NeoHubConnectionError(Error):
 
 
 class NeoHub:
-    def __init__(self, host='Neo-Hub', port=4242, request_timeout=5, request_attempts=1):
+    def __init__(self, host='Neo-Hub', port=4242, request_timeout=60, request_attempts=1):
         self._logger = logging.getLogger('neohub')
         self._host = host
         self._port = port
