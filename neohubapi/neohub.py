@@ -487,7 +487,6 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
-
     async def set_target_temperature(self, temperature: int, devices: [NeoStat]):
         """
         Sets the thermostat's temperature
