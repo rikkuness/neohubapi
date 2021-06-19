@@ -467,6 +467,27 @@ class NeoHub:
         result = await self._send(message, reply)
         return result
 
+    async def set_cool_temp(self, temperature: int, devices: [NeoStat]):
+        """
+        Sets the thermostat's cooling temperature i.e. the temperature that will
+        trigger the thermostat if exceeded. Note that this is only supported on
+        the HC (Heating/Cooling) thermostats.
+
+        The temperature will be reset once next comfort level is reached
+        """
+
+        try:
+            names = [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
+
+        message = {"SET_COOL_TEMP": [temperature, names]}
+        reply = {"result": "temperature was set"}
+
+        result = await self._send(message, reply)
+        return result
+
+
     async def set_target_temperature(self, temperature: int, devices: [NeoStat]):
         """
         Sets the thermostat's temperature

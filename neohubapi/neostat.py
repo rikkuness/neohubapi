@@ -165,6 +165,10 @@ class NeoStat(SimpleNamespace):
         result = await self._hub.set_target_temperature(temperature, [self])
         return result
 
+    async def set_cool_temp(self, temperature: int):
+        result = await self._hub.set_cool_temp(temperature, [self])
+        return result
+
     async def set_diff(self, switching_differential: int):
         result = await self._hub.set_diff(switching_differential, [self])
         return result
