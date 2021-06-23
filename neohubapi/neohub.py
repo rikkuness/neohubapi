@@ -10,6 +10,7 @@ import socket
 from async_property import async_cached_property
 from types import SimpleNamespace
 
+from neohubapi.enums import HCMode
 from neohubapi.enums import ScheduleFormat
 from neohubapi.enums import schedule_format_int_to_enum
 from neohubapi.neostat import NeoStat
@@ -83,6 +84,15 @@ class NeoHub:
         if expected_reply is None and last_exception is not None:
             raise(last_exception)
         return False
+
+    def _devices_to_names(self, devices: [NeoStat]):
+        """
+            Returns the list of device names
+        """
+        try:
+            return [x.name for x in devices]
+        except (TypeError, AttributeError):
+            raise NeoHubUsageError('devices must be a list of NeoStat objects')
 
     async def firmware(self):
         """
@@ -160,6 +170,14 @@ class NeoHub:
 
         message = {"SET_TEMP_FORMAT": temp_format}
         reply = {"result": f"Temperature format set to {temp_format}"}
+
+    async def set_hc_mode(self, hc_mode: HCMode, devices: [NeoStat]):
+        """
+        Set hc_mode to AUTO or...
+        """
+        names = self._devices_to_names(devices)
+        message = {"SET_HC_MODE": [hc_mode.value, names]}
+        reply = {"result": f"HC_MODE was set"}
 
         result = await self._send(message, reply)
         return result
@@ -424,11 +442,7 @@ class NeoHub:
             pin = pin // 10
         pins.reverse()
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"LOCK": [pins, names]}
         reply = {"result": "locked"}
 
@@ -440,11 +454,7 @@ class NeoHub:
         Unlocks PIN locked thermostats
         """
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"UNLOCK": names}
         reply = {"result": "unlocked"}
 
@@ -456,11 +466,7 @@ class NeoHub:
         Enables or disables Frost mode
         """
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"FROST_ON" if state else "FROST_OFF": names}
         reply = {"result": "frost on" if state else "frost off"}
 
@@ -476,11 +482,7 @@ class NeoHub:
         The temperature will be reset once next comfort level is reached
         """
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"SET_COOL_TEMP": [temperature, names]}
         reply = {"result": "temperature was set"}
 
@@ -494,11 +496,7 @@ class NeoHub:
         The temperature will be reset once next comfort level is reached
         """
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"SET_TEMP": [temperature, names]}
         reply = {"result": "temperature was set"}
 
@@ -516,11 +514,7 @@ class NeoHub:
         3: 3 degrees
         """
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"SET_DIFF": [switching_differential, names]}
         reply = {"result": "switching differential was set"}
 
@@ -532,11 +526,7 @@ class NeoHub:
         Returns time in minutes required to change temperature by 1 degree
         """
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"VIEW_ROC": names}
 
         result = await self._send(message)
@@ -550,11 +540,7 @@ class NeoHub:
         NeoStats that are in timeclock mode.
         """
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"TIMER_ON" if state else "TIMER_OFF": names}
         reply = {"result": "timers on" if state else "timers off"}
 
@@ -568,13 +554,11 @@ class NeoHub:
         This function works with NeoStats in timeclock mode
         """
 
-        try:
-            names = [x.name for x in devices]
-        except (TypeError, AttributeError):
-            raise NeoHubUsageError('devices must be a list of NeoStat objects')
-
+        names = self._devices_to_names(devices)
         message = {"TIMER_HOLD_ON" if state else "TIMER_HOLD_OFF": [minutes, names]}
         reply = {"result": "timer hold on" if state else "timer hold off"}
 
         result = await self._send(message, reply)
         return result
+
+
