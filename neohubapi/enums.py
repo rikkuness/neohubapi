@@ -46,6 +46,7 @@ class Weekday(enum.Enum):
     SATURDAY = "saturday"
     SUNDAY = "sunday"
 
+
 class HCMode(enum.Enum):
     AUTO = "AUTO"
     COOLING = "COOLING"

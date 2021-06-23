@@ -171,13 +171,16 @@ class NeoHub:
         message = {"SET_TEMP_FORMAT": temp_format}
         reply = {"result": f"Temperature format set to {temp_format}"}
 
+        result = await self._send(message, reply)
+        return result
+
     async def set_hc_mode(self, hc_mode: HCMode, devices: [NeoStat]):
         """
         Set hc_mode to AUTO or...
         """
         names = self._devices_to_names(devices)
         message = {"SET_HC_MODE": [hc_mode.value, names]}
-        reply = {"result": f"HC_MODE was set"}
+        reply = {"result": "HC_MODE was set"}
 
         result = await self._send(message, reply)
         return result
@@ -560,5 +563,3 @@ class NeoHub:
 
         result = await self._send(message, reply)
         return result
-
-

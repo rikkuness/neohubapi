@@ -8,6 +8,7 @@ from types import SimpleNamespace
 
 from async_property import async_property
 
+from neohubapi.enums import HCMode
 from neohubapi.enums import Weekday
 
 
@@ -165,7 +166,7 @@ class NeoStat(SimpleNamespace):
         result = await self._hub.set_target_temperature(temperature, [self])
         return result
 
-    async def set_hc_mode(self, hc_mode: str):
+    async def set_hc_mode(self, hc_mode: HCMode):
         result = await self._hub.set_hc_mode(hc_mode, [self])
         return result
 
