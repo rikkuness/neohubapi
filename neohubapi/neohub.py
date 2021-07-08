@@ -65,7 +65,7 @@ class NeoHub:
                     return reply
                 if reply.__dict__ == expected_reply:
                     return True
-                self._logger.error(f"[{attempt}] Unexpected reply: {reply}")
+                self._logger.error(f"[{attempt}] Unexpected reply: {reply} for message: {message}")
             except (socket.gaierror, ConnectionRefusedError) as e:
                 last_exception = NeoHubConnectionError(e)
                 self._logger.error(f"[{attempt}] Could not connect to NeoHub at {self._host}: {e}")
