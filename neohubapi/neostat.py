@@ -76,7 +76,7 @@ class NeoStat(SimpleNamespace):
             self.__dict__[a] = getattr(self._data_, data_attr, None)
 
         # Renamed attrs
-        self.name = getattr(self._data_, 'ZONE_NAME', None)
+        self.name = getattr(self._data_, 'ZONE_NAME', getattr(self._data_, 'device', None))
         self.floor_limit = getattr(self._data_, 'ZONE_NAME', None)
         self.target_temperature = getattr(self._data_, 'SET_TEMP', None)
         self.temperature = getattr(self._data_, 'ACTUAL_TEMP', None)
