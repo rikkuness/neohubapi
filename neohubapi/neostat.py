@@ -82,7 +82,6 @@ class NeoStat(SimpleNamespace):
 
         # must be ints
         self.pin_number = int(self.pin_number)
-        self.preheat_active = int(self.preheat_active)
 
         # HOLD_TIME can be up to 99:99
         _hold_time = list(map(int, self.hold_time.split(':')))
