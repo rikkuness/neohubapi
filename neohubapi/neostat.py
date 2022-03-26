@@ -94,9 +94,14 @@ class NeoStat(SimpleNamespace):
         self.switch_delay_left = timedelta(
                 hours=_switch_delay_left.hour,
                 minutes=_switch_delay_left.minute)
-        _time = datetime.strptime(self.time, "%H:%M")
-        self.time = timedelta(hours=_time.hour, minutes=_time.minute)
 
+        try:
+            _time = datetime.strptime(self.time, "%H:%M")
+            self.time = timedelta(hours=_time.hour, minutes=_time.minute)
+        except Exception as e:
+            self._logger.warning(f"Failed to parse time {e}")
+            self.time = None
+            
     def __str__(self):
         """
         String representation.
